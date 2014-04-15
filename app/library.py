@@ -6,6 +6,11 @@ import sys
 
 class TweepyAPIs (object):
   """Base class for all needed tweepy APIs"""
+  _trends_type = {
+      'current': 'trends_current',
+      'daily': 'trends_daily',
+      'weekly': 'trends_weekly',
+  }
 
   def __init__ (self):
     # Put your twitter credentials here.
@@ -21,3 +26,10 @@ class TweepyAPIs (object):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     self._api = tweepy.API(auth, parser=tweepy.parsers.ModelParser())
+
+  def GetTrends (self, trend_type='default'):
+    return getattr(self._api, TweepyAPIs._trends_type.get(trend_type,
+                                                          'trends'))()
+
+  def GetTrendsByLocation (self, woeid=23424977):
+    return self._api.trends_location(woeid)
