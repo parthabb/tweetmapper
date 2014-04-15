@@ -6,7 +6,6 @@ import sys
 
 class TweepyAPIs (object):
   """Base class for all needed tweepy APIs"""
-
   def __init__ (self):
     # Put your twitter credentials here.
     consumer_key = "sLA3Hp02Fki2vUWufjNAi1kpS"
@@ -21,3 +20,12 @@ class TweepyAPIs (object):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     self._api = tweepy.API(auth, parser=tweepy.parsers.ModelParser())
+
+  def GetTrends (self):
+    """Retruns the available trends."""
+    return self._api.trends_available()
+
+  def GetTrendsByLocation (self, woeid=23424977):
+    """Get trends based on the locations WOEID. Default is US."""
+    return self._api.trends_place(woeid)
+
