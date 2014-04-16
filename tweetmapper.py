@@ -9,6 +9,7 @@ import pickle
 
 city_coordinates = [(0,0)]
 stopwords = ()
+TOTAL_CITIES = 50
 
 
 def classify_city_id(geocode):
@@ -44,6 +45,7 @@ class TweetMapper (object):
   def __init__ (self):
     self.inverse_term_matrix = {}
     self._total_docs = 0
+    self.data = []
 
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
@@ -85,4 +87,9 @@ class TweetMapper (object):
         self.inverse_term_matrix[token] = postings
 
   def contruct_training_data(self):
-    pass
+    """Construct a representation of the data to be used in classification."""
+    for city_id in xrange(TOTAL_CITIES):
+      temp = [city_id]
+      for postings in self.inverse_term_matrix.values():
+        temp.append(postings.get(city_id, 0))
+      self.data.append(','.join(temp))
