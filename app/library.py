@@ -2,7 +2,15 @@
 
 import tweepy
 import sys
+from tweepy.streaming import StreamListener
 
+class listener(StreamListener):
+    def on_data(self, data):
+        print data
+        return True
+
+    def on_error(self, status):
+        print status
 
 class TweepyAPIs (object):
   """Base class for all needed tweepy APIs"""
@@ -20,6 +28,7 @@ class TweepyAPIs (object):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     self._api = tweepy.API(auth, parser=tweepy.parsers.ModelParser())
+    self.stream =  tweepy.Stream(auth, listener())
 
   def GetTrends (self):
     """Retruns the available trends."""
