@@ -18,19 +18,12 @@ class TweetCollector(object):
         
     def search(self, term):
         handle = TweepyAPIs()
-        results = handle._api.search(q=term,lang="en",count=100,include_rts="true");
-        self.APIcount = self.APIcount + 1
-        #print results
-        self.jsonWrite(results)
-        for tweet in results:
-            print self.APIcount
-            if self.APIcount < 90:
-                if tweet.retweet_count != 0:
-                    retweets = handle._api.retweets(tweet.id)
-                    self.APIcount = self.APIcount + 1 
-                    print retweets 
-            else:
-                self.countDown()
+        if self.APIcount < 90:
+            self.results = handle._api.search(q=term,lang="en",count=100,include_rts="true");
+            self.APIcount = self.APIcount + 1
+            print self.results
+        else:
+            self.countDown()
 
     def countDown(self):
         start = time.time();
@@ -41,6 +34,8 @@ class TweetCollector(object):
             current = time.time();
     #search(term);
         self.APIcount = 0;
+    
+    
 tw = TweetCollector()
 tw.search("KatyPerry")
         
