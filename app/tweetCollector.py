@@ -5,7 +5,6 @@ Created on Apr 15, 2014
 '''
 import pickle
 import library
-import time
 import tweepy
 
 _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
@@ -24,7 +23,7 @@ class TweetCollector(object):
   '''
   def __init__(self):
     '''
-    Constructor
+    collects tweets using rest API
     '''
     pass
 
@@ -51,32 +50,16 @@ class TweetCollector(object):
 
 
 class TweetStream(object):
+  '''
+  collects tweets from the streaming API
+  '''
+  def __init__(self):
     '''
-    classdocs
+    Constructor
     '''
-    def __init__(self):
-        '''
-        Constructor
-        '''
-        self.APIcount = 0
+    self.APIcount = 0
 
-    def stream(self,trend):
-        handle = library.TweepyAPIs()
-        if self.APIcount < 90:
-            self.results = handle.stream;
-            self.APIcount = self.APIcount + 1
-            #print json.dumps(self.results)
-            #trend = "["+trend+"]"
-            self.results.filter(track=list)
-        else:
-            self.countDown()
-
-    def countDown(self):
-        start = time.time();
-        current = time.time();
-        print "Counting down...."
-        while (current - start) < 900:
-            #print (current-start);
-            current = time.time();
-    #search(term);
-        self.APIcount = 0;
+  def stream(self,trend):
+    handle = library.TweepyAPIs()
+    self.results = handle.stream;
+    self.results.filter(track=trend)
