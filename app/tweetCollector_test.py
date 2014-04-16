@@ -3,14 +3,13 @@ import tweetCollector
 
 class TweetCollectorTest(object):
   def __init__(self):
-    self.tc = tweetCollector.TweetCollector()
+    self.tc = tweetCollector.TweetStream()
 
   def run(self):
     tas = library.TweepyAPIs()
     trends = tas.GetTrendsByLocation()[0].get('trends', [])
-    for trend in trends:
-      if trend.get('name'):
-        self.tc.search(trend['name'])
+    terms = [trend.get('name') for trend in trends]
+    self.tc.stream(terms)
 
 if __name__ == '__main__':
   tct = TweetCollectorTest()

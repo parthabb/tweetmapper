@@ -1,16 +1,19 @@
 # Utility methods.
 
 import tweepy
+from tweepy import streaming
 import sys
-from tweepy.streaming import StreamListener
 
-class listener(StreamListener):
-    def on_data(self, data):
-        print data
-        return True
 
-    def on_error(self, status):
-        print status
+class listener(streaming.StreamListener):
+  def on_data(self, data):
+    
+    print data
+    return True
+
+  def on_error(self, status):
+    print status
+
 
 class TweepyAPIs (object):
   """Base class for all needed tweepy APIs"""
@@ -24,7 +27,7 @@ class TweepyAPIs (object):
     if not (consumer_key and consumer_secret and access_key and access_secret):
         print "Please enter all of your credentials."
         sys.exit()
-  
+
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     self._api = tweepy.API(auth, parser=tweepy.parsers.ModelParser())

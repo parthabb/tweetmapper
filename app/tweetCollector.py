@@ -3,8 +3,8 @@ Created on Apr 15, 2014
 
 @author: spoyler
 '''
-import pickle
 import library
+import pickle
 import tweepy
 
 _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
@@ -44,7 +44,6 @@ class TweetCollector(object):
 
 
     term = term.rstrip(' -RT')
-    print '%s: %s' % (term, len(results))
     with open('%s.txt' % term, 'w') as f:
       pickle.dump(results, f)
 
@@ -62,4 +61,4 @@ class TweetStream(object):
   def stream(self,trend):
     handle = library.TweepyAPIs()
     self.results = handle.stream;
-    self.results.filter(track=trend)
+    self.results.filter(track=trend, languages=['en'], locations=[-180,-90,180,90])
