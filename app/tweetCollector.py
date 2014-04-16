@@ -4,7 +4,8 @@ Created on Apr 15, 2014
 @author: spoyler
 '''
 import pickle
-import library 
+import library
+import time
 import tweepy
 
 _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
@@ -15,6 +16,7 @@ _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
                     'in_reply_to_user_id_str', 'lang', 'place',
                     'retweet_count',
                     'retweeted', 'source')
+
 
 class TweetCollector(object):
   '''
@@ -46,3 +48,35 @@ class TweetCollector(object):
     print '%s: %s' % (term, len(results))
     with open('%s.txt' % term, 'w') as f:
       pickle.dump(results, f)
+
+
+class TweetStream(object):
+    '''
+    classdocs
+    '''
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        self.APIcount = 0
+
+    def stream(self,trend):
+        handle = library.TweepyAPIs()
+        if self.APIcount < 90:
+            self.results = handle.stream;
+            self.APIcount = self.APIcount + 1
+            #print json.dumps(self.results)
+            #trend = "["+trend+"]"
+            self.results.filter(track=list)
+        else:
+            self.countDown()
+
+    def countDown(self):
+        start = time.time();
+        current = time.time();
+        print "Counting down...."
+        while (current - start) < 900:
+            #print (current-start);
+            current = time.time();
+    #search(term);
+        self.APIcount = 0;
