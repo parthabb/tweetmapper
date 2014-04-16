@@ -19,9 +19,9 @@ class TweetCollector(object):
     def search(self, term):
         handle = TweepyAPIs()
         if self.APIcount < 90:
-            results = handle._api.search(q=term,lang="en",count=100,include_rts="true");
+            self.results = handle._api.search(q=term,lang="en",count=100,include_rts="true");
             self.APIcount = self.APIcount + 1
-            print results
+            print self.results
         else:
             self.countDown()
 
