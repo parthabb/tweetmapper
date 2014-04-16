@@ -9,7 +9,7 @@ import json
 
 class TweetCollector(object):
     '''
-    classdocs
+    collects tweets using rest API
     '''
     def __init__(self):
         '''
@@ -31,14 +31,12 @@ class TweetCollector(object):
         current = time.time();
         print "Counting down...."
         while (current - start) < 900:
-            #print (current-start);
             current = time.time();
-    #search(term);
         self.APIcount = 0;
         
 class TweetStream(object):
     '''
-    classdocs
+    collects tweets from the streaming API
     '''
     def __init__(self):
         '''
@@ -48,26 +46,19 @@ class TweetStream(object):
         
     def stream(self,trend):
         handle = TweepyAPIs()
-        if self.APIcount < 90:
-            self.results = handle.stream;
-            self.APIcount = self.APIcount + 1
-            #print json.dumps(self.results)
-            #trend = "["+trend+"]"
-            self.results.filter(track=list)
-        else:
-            self.countDown()
+        self.results = handle.stream;
+        self.results.filter(track=trend)
 
     def countDown(self):
         start = time.time();
         current = time.time();
         print "Counting down...."
         while (current - start) < 900:
-            #print (current-start);
             current = time.time();
-    #search(term);
         self.APIcount = 0;
+    
          
 ts = TweetStream()
-list = ["KatyPerry"]
-ts.stream(list)
+lst = ["KatyPerry"]
+ts.stream(lst)
         
