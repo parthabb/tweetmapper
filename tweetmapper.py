@@ -16,8 +16,8 @@ TOTAL_CITIES = 50
 def classify_city_id(geocode):
   nearest_city_id = 0
   identifier = 0
-  minimum = math.sqrt(math.pow(city_coordinates[0](0) - geocode(0), 2) +
-                  math.pow(city_coordinates[0](1) - geocode(1), 2))
+  minimum = math.sqrt(math.pow(city_coordinates[0][0] - geocode[0], 2) +
+                  math.pow(city_coordinates[0][1] - geocode[1], 2))
   for city in city_coordinates[1:]:
     identifier += 1
     temp = math.sqrt(math.pow(city(0) - geocode(0), 2) +
@@ -56,9 +56,9 @@ class TweetMapper (object):
     for trending_tweet_file in filenames:
 
       tweets = []
-
       with open(trending_tweet_file, 'r') as f:
-        tweets = pickle.load(f.read())
+        #print f.read()
+        tweets = pickle.load(f)
 
       for tweet in tweets:
         self._construct_inverse_map(tweet)
@@ -84,7 +84,7 @@ class TweetMapper (object):
         token = self._case_fold(token)
         if token in nltk.corpus.stopwords.words('english'):
           continue
-        token = nltk.WordNetLemmatizer().lammetize(token)
+        token = nltk.WordNetLemmatizer().lemmatize(token)
         postings = self.inverse_term_matrix.get(token, {tweet_city: 0})
         postings[tweet_city] = postings.get(tweet_city, 0) + 1
         self.inverse_term_matrix[token] = postings
