@@ -2,21 +2,22 @@
 
 
 import math
+import nltk
 import os
 import re
 import pickle
 
 
 city_coordinates = [(0,0)]
-stopwords = ()
+
 TOTAL_CITIES = 50
 
 
 def classify_city_id(geocode):
   nearest_city_id = 0
   identifier = 0
-  minimum = math.sqrt(math.pow(city_coordinates[0](0) - geocode(0), 2) +
-                  math.pow(city_coordinates[0](1) - geocode(1), 2))
+  minimum = math.sqrt(math.pow(city_coordinates[0][0] - geocode[0], 2) +
+                  math.pow(city_coordinates[0][1] - geocode[1], 2))
   for city in city_coordinates[1:]:
     identifier += 1
     temp = math.sqrt(math.pow(city(0) - geocode(0), 2) +
@@ -55,7 +56,8 @@ class TweetMapper (object):
     for trending_tweet_file in filenames:
       tweets = []
       with open(trending_tweet_file, 'r') as f:
-        tweets = pickle.load(f.read())
+        #print f.read()
+        tweets = pickle.load(f)
 
       for tweet in tweets:
         self._construct_inverse_map(tweet)
@@ -78,8 +80,9 @@ class TweetMapper (object):
 
     for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
       token = self._case_fold(token)
-      if not token or token in stopwords:
+      if not token or token in nltk.corpus.stopwords.words('english'):
         continue
+      token = nltk.WordNetLemmatizer().lemmatize(token)
       postings = self.inverse_term_matrix.get(token, {tweet_city: 0.0})
       postings[tweet_city] = postings.get(tweet_city, 0.0) + 1.0
       self.inverse_term_matrix[token] = postings
@@ -107,8 +110,9 @@ class TweetMapper (object):
     for tweet in tweets_of_a_trend:
       for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
         token = self._case_fold(token)
-        if not token or token in stopwords:
+        if not token or token in nltk.corpus.stopwords.words('english'):
           continue
+        token = nltk.WordNetLemmatizer().lemmatize(token)
         query_term_vector[token] += query_term_vector.get(token, 0.0) + 1
     query_magnitude = math.sqrt(
         math.fsum([math.pow(count, 2) for count in query_term_vector.values()]))
