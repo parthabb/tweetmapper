@@ -7,8 +7,9 @@ import os
 import re
 import pickle
 
+from app import tweetClassify
 
-city_coordinates = [(0,0)]
+city_coordinates = [coordinates[2] for coordinates in tweetClassify.cities]
 
 TOTAL_CITIES = 50
 
