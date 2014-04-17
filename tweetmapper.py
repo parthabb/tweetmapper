@@ -84,7 +84,8 @@ class TweetMapper (object):
   def __init__ (self):
     self.inverse_term_matrix = {}
     self._total_docs = 0
-    self.data = []
+    self.traing_data = []
+    self.target = []
 
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
@@ -125,10 +126,19 @@ class TweetMapper (object):
         postings[tweet_city] = postings.get(tweet_city, 0) + 1
         self.inverse_term_matrix[token] = postings
 
-  def contruct_training_data(self):
+  def contruct_data(self, tweet):
     """Construct a representation of the data to be used in classification."""
+    
+    
+    
+    
+    
+    
+    
+    
     for city_id in xrange(TOTAL_CITIES):
-      temp = [city_id]
       for postings in self.inverse_term_matrix.values():
+        self.target.append(city_id)
+        temp = []
         temp.append(postings.get(city_id, 0))
       self.data.append(','.join(temp))
