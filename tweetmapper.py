@@ -44,18 +44,16 @@ class TweetMapper (object):
   """Main tweetmapper application."""
   def __init__ (self):
     self.inverse_term_matrix = {}
-    self._total_docs = 0
     self.traing_data = []
     self.target = []
+    self.city_vectors = {}
+    self.city_vectors_magnitude = {}
 
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
-    self._total_docs = len(filenames)
 
     for trending_tweet_file in filenames:
-
       tweets = []
-
       with open(trending_tweet_file, 'r') as f:
         tweets = pickle.load(f.read())
 
@@ -65,41 +63,73 @@ class TweetMapper (object):
   def calculate_tfidf(self):
     """Calculate the TF-IDF."""
     for _, posting in self.inverse_term_matrix.iteritems():
-      idf = math.log10(float(50)/float(len(posting.keys())))
+      idf = math.log10(50.0/float(len(posting.keys())))
       for city, tf in posting.iteritems():
-        tfidf = float(1 + math.log10(tf)) * idf
+        tfidf = float(1.0 + math.log10(tf)) * idf
         posting[city] = tfidf
 
   def _case_fold (self, text):
     """Case the given word."""
     return text.lower()
 
-  def _construct_inverse_map(self, tweet):
+  def _construct_inverse_map (self, tweet):
     """Construct an inverse term dictionary."""
     tweet_city = classify_city_id(tweet['coordinates']['coordinates'])
 
     for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
-      if token:
-        token = self._case_fold(token)
-        if token in stopwords:
-          continue
-        postings = self.inverse_term_matrix.get(token, {tweet_city: 0})
-        postings[tweet_city] = postings.get(tweet_city, 0) + 1
-        self.inverse_term_matrix[token] = postings
+      token = self._case_fold(token)
+      if not token or token in stopwords:
+        continue
+      postings = self.inverse_term_matrix.get(token, {tweet_city: 0.0})
+      postings[tweet_city] = postings.get(tweet_city, 0.0) + 1.0
+      self.inverse_term_matrix[token] = postings
 
-  def contruct_data(self, tweet):
-    """Construct a representation of the data to be used in classification."""
-    
-    
-    
-    
-    
-    
-    
-    
-    for city_id in xrange(TOTAL_CITIES):
-      for postings in self.inverse_term_matrix.values():
-        self.target.append(city_id)
-        temp = []
-        temp.append(postings.get(city_id, 0))
-      self.data.append(','.join(temp))
+  def generate_city_vectors (self):
+    for term, postings in self.inverse_term_matrix.iteritems():
+      for city, tfidf in postings.iteritems():
+        words = self.city_vectors.get(city, {})
+        words[term] = tfidf
+        self.city_vectors[city] = words
+
+    self.calculate_city_vectors_magnitude()
+
+  def calculate_city_vectors_magnitude(self):
+    for city, vector in self.city_vectors.iteritems():
+      self.city_vectors_magnitude[city] = math.sqrt(
+          math.fsum([math.pow(tfidf, 2) for tfidf in vector.values()]))
+
+  def calculate_cosine_similarity (self, tweets_of_a_trend):  # tweets are in a list.
+    """Return the most similar cities for the trend."""
+    if not tweets_of_a_trend:
+      print 'No tweets to classify.'
+      return
+    query_term_vector = {}
+    for tweet in tweets_of_a_trend:
+      for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
+        token = self._case_fold(token)
+        if not token or token in stopwords:
+          continue
+        query_term_vector[token] += query_term_vector.get(token, 0.0) + 1
+    query_magnitude = math.sqrt(
+        math.fsum([math.pow(count, 2) for count in query_term_vector.values()]))
+
+    # Calculate cosine scores.
+    cosine_scores = {}
+    for city, postings in self.city_vectors.iteritems():
+      for word in query_term_vector.keys():
+        cosine_scores[city] = cosine_scores.get(city, 0.0) + (
+            query_term_vector[word] * postings.get(word, 0.0))
+      cosine_scores[city] = cosine_scores[city] / (
+          self.city_vectors_magnitude[city] * query_magnitude)
+
+    return sorted(cosine_scores.iteritems(),
+                  key=lambda x: x[1],
+                  reverse=True
+                 )[:10]
+
+  def run(self):
+    self.read_tweet_from_file()
+    self.calculate_tfidf()
+    self.generate_city_vectors()
+    tweets_of_a_trend = []
+    self.calculate_cosine_similarity(tweets_of_a_trend)
