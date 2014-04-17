@@ -65,7 +65,7 @@ class TweetMapper (object):
   def calculate_tfidf(self):
     """Calculate the TF-IDF."""
     for _, posting in self.inverse_term_matrix.iteritems():
-      idf = math.log10(float(self._total_docs)/float(len(posting.keys())))
+      idf = math.log10(float(50)/float(len(posting.keys())))
       for city, tf in posting.iteritems():
         tfidf = float(1 + math.log10(tf)) * idf
         posting[city] = tfidf
