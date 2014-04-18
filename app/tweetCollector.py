@@ -6,6 +6,10 @@ Created on Apr 15, 2014
 import library
 import pickle
 import tweepy
+import fnmatch
+import os
+import json
+import cjson
 
 _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
                     'coordinates', 'favorite_count', 'favorited',
@@ -62,3 +66,34 @@ class TweetStream(object):
     handle = library.TweepyAPIs()
     self.results = handle.stream;
     self.results.filter(track=trend, languages=['en'], locations=[-180,-90,180,90])
+
+class Filter(object):
+    '''
+    Filter tweets according to language and location
+    '''
+    def process(self,dr):
+        '''assumes nsf-awards-abstracts is in the python folder'''
+        for dirpath, dirs, files in os.walk(dr):
+            for eFile in fnmatch.filter(files, '*.txt'):
+                fle = dirpath+"/"+eFile
+                newfile = dirpath+"/"+"new.txt"
+                f = open(newfile,"w")
+                #print fle
+                if os.path.isfile(fle) and fle != None:
+                  with open(fle,'r') as myfile:
+                    for line in myfile:
+                        print line
+                        line = cjson.decode(line)
+                        if "text" in line:
+                            tweet = {}
+                            #myfile = json.loads(myfile)
+                            tweet["text"] = line["text"]
+                            tweet["coordinates"] = line["coordinates"]
+                            if line["lang"] and line["coordinates"]:
+                                if line["lang"] == "en" and line["coordinates"]["type"] == "Point":
+                                    if float(tweet["coordinates"]["coordinates"][0]) > -157 and float(tweet["coordinates"]["coordinates"][0]) < -66 and float(tweet["coordinates"]["coordinates"][1]) < 64 and float(tweet["coordinates"]["coordinates"][1]) >20:
+                                        tweet = json.dumps(tweet)
+                                        f.writelines(tweet)
+                                        f.write("\n")
+                os.rename(newfile, fle)
+                #os.remove(newfile)
