@@ -10,7 +10,13 @@ class TweetCollectorTest(object):
     trends = tas.GetTrendsByLocation()[0].get('trends', [])
     terms = [trend.get('name') for trend in trends]
     self.tc.stream(terms)
+    
+  def filter(self):
+    fil = tweetCollector.Filter()
+    dir = "data"
+    fil.process(dir)
 
 if __name__ == '__main__':
   tct = TweetCollectorTest()
-  tct.run()
+  #tct.run()
+  tct.filter()
