@@ -3,13 +3,22 @@
 import tweepy
 from tweepy import streaming
 import sys
-
+import json
 
 class listener(streaming.StreamListener):
-  def on_data(self, data):
+  def __init__(self, api=None):
+    super(listener, self).__init__()
+    self.num_tweets = 0
     
-    print data
-    return True
+  def on_data(self, data):
+    self.num_tweets +=1
+    f = open("test_tweets.txt","a")
+    f.write(data)
+    f.close()
+    if self.num_tweets < 300:
+        return True
+    else:
+        return False
 
   def on_error(self, status):
     print status
