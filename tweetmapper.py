@@ -6,6 +6,7 @@ import nltk
 import os
 import re
 import pickle
+import json
 
 from app import tweetClassify
 
@@ -21,10 +22,10 @@ def classify_city_id(geocode):
                   math.pow(city_coordinates[0][1] - geocode[1], 2))
   for city in city_coordinates[1:]:
     identifier += 1
-    temp = math.sqrt(math.pow(city(0) - geocode(0), 2) +
-                     math.pow(city(1) - geocode(1), 2))
+    temp = math.sqrt(math.pow(city[0] - geocode[0], 2) +
+                     math.pow(city[1] - geocode[1], 2))
     if temp < minimum:
-      nearest_city_id = id
+      nearest_city_id = identifier
   return nearest_city_id
 
 
@@ -35,7 +36,7 @@ def get_all_file_names():
     A list of all files in directory tweets ending with '.txt'.
   """
   all_txt_files = []
-  for root, _, files in os.walk('tweets'):
+  for root, _, files in os.walk('data'):
     for f in files:
       if f.endswith('.txt'):
         all_txt_files.append(os.path.join(root, f))
@@ -57,10 +58,11 @@ class TweetMapper (object):
     for trending_tweet_file in filenames:
       tweets = []
       with open(trending_tweet_file, 'r') as f:
-        #print f.read()
-        tweets = pickle.load(f)
+        tweets = f.readlines()
 
       for tweet in tweets:
+        #print tweet
+        tweet = json.loads(tweet)
         self._construct_inverse_map(tweet)
 
   def calculate_tfidf(self):
