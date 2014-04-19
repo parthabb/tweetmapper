@@ -18,13 +18,14 @@ TOTAL_CITIES = 50
 def classify_city_id(geocode):
   nearest_city_id = 0
   identifier = 0
-  minimum = math.sqrt(math.pow(city_coordinates[0][0] - geocode[0], 2) +
-                  math.pow(city_coordinates[0][1] - geocode[1], 2))
+  minimum = math.sqrt(math.pow(float(city_coordinates[0][0]) - float(geocode[0]), 2) +
+                  math.pow(float(city_coordinates[0][1]) - float(geocode[1]), 2))
   for city in city_coordinates[1:]:
     identifier += 1
-    temp = math.sqrt(math.pow(city[0] - geocode[0], 2) +
-                     math.pow(city[1] - geocode[1], 2))
+    temp = math.sqrt(math.pow(float(city[0]) - float(geocode[0]), 2) +
+                     math.pow(float(city[1]) - float(geocode[1]), 2))
     if temp < minimum:
+      minimum = temp
       nearest_city_id = identifier
   return nearest_city_id
 
@@ -61,7 +62,6 @@ class TweetMapper (object):
         tweets = f.readlines()
 
       for tweet in tweets:
-        #print tweet
         tweet = json.loads(tweet)
         self._construct_inverse_map(tweet)
 
