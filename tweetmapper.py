@@ -21,10 +21,10 @@ def classify_city_id(geocode):
                   math.pow(city_coordinates[0][1] - geocode[1], 2))
   for city in city_coordinates[1:]:
     identifier += 1
-    temp = math.sqrt(math.pow(city(0) - geocode(0), 2) +
-                     math.pow(city(1) - geocode(1), 2))
+    temp = math.sqrt(math.pow(city[0] - geocode[0], 2) +
+                     math.pow(city[1] - geocode[1], 2))
     if temp < minimum:
-      nearest_city_id = id
+      nearest_city_id = identifier
   return nearest_city_id
 
 
