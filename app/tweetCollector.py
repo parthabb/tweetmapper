@@ -64,21 +64,21 @@ class TweetStream(object):
 
   def stream(self,trend):
     test = {}
-    handle = library.TweepyAPIs()
-    self.results = handle.stream;
     for tr in trend:
         if tr.strip() != "":
+            handle = library.TweepyAPIs(tr)
+            self.results = handle.stream;
             print tr
-            f = open("test_tweets.txt","a")
-            f.writelines("{"+tr+":")
-            f.writelines("[")
-            tr = "["+tr+"]"
-            f.close()
+            #f = open("test_tweets.txt","a")
+            #f.writelines("{"+tr+":")
+            #f.writelines("[")
+            tr = [tr]
+            #f.close()
             self.results.filter(track=tr, languages=['en'], locations=[-180,-90,180,90])
-            f = open("test_tweets.txt","a")
-            f.writelines("]")
-            f.writelines("}")
-            f.close()
+            #f = open("test_tweets.txt","a")
+            #f.writelines("]")
+            #f.writelines("}")
+            #f.close()
 
 class Filter(object):
     '''

@@ -6,13 +6,14 @@ import sys
 import json
 
 class listener(streaming.StreamListener):
-  def __init__(self, api=None):
+  def __init__(self, tr, api=None):
     super(listener, self).__init__()
     self.num_tweets = 0
+    self.file = tr
     
   def on_data(self, data):
     self.num_tweets +=1
-    f = open("test_tweets.txt","a")
+    f = open("%s.txt" % self.file,"a")
     f.write(data)
     f.close()
     if self.num_tweets < 300:
@@ -26,7 +27,7 @@ class listener(streaming.StreamListener):
 
 class TweepyAPIs (object):
   """Base class for all needed tweepy APIs"""
-  def __init__ (self):
+  def __init__ (self, tr=""):
     # Put your twitter credentials here.
     consumer_key = "W48HuKv5qcEl9bryHwAjA"
     consumer_secret = "vf4M7dxlXQRuwdM1dASB0sg0ZkxnlMSWLWNc9B4"
@@ -40,7 +41,8 @@ class TweepyAPIs (object):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     self._api = tweepy.API(auth, parser=tweepy.parsers.ModelParser())
-    self.stream =  tweepy.Stream(auth, listener())
+    if tr:
+        self.stream =  tweepy.Stream(auth, listener(tr))
 
   def GetTrends (self):
     """Retruns the available trends."""
