@@ -6,7 +6,7 @@ from tweetmapper import TweetMapper
 
 def test_get_all_file_names():
   print """ =================== get_all_file_names ================== """
-  print [trend.lstrip('tweets/').rstrip('.txt') for trend in tweetmapper.get_all_file_names()]
+  print [trend.lstrip('data/').rstrip('.txt') for trend in tweetmapper.get_all_file_names()]
   print """ =================== get_all_file_names ================== """
 
 def test_scoring():

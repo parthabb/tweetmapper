@@ -7,6 +7,7 @@ import os
 import re
 import pickle
 import json
+import fnmatch
 
 from app import tweetClassify
 
@@ -64,6 +65,7 @@ class TweetMapper (object):
       for tweet in tweets:
         tweet = json.loads(tweet)
         self._construct_inverse_map(tweet)
+    #print self.inverse_term_matrix
 
   def calculate_tfidf(self):
     """Calculate the TF-IDF."""
@@ -111,12 +113,17 @@ class TweetMapper (object):
       return
     query_term_vector = {}
     for tweet in tweets_of_a_trend:
+      #print tweet
+      tweet = json.loads(tweet)
       for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
         token = self._case_fold(token)
         if not token or token in nltk.corpus.stopwords.words('english'):
           continue
         token = nltk.WordNetLemmatizer().lemmatize(token)
-        query_term_vector[token] += query_term_vector.get(token, 0.0) + 1
+        if query_term_vector.get(token,False):
+            query_term_vector[token] += query_term_vector.get(token, 0.0) + 1
+        else:
+            query_term_vector[token] = 1
     query_magnitude = math.sqrt(
         math.fsum([math.pow(count, 2) for count in query_term_vector.values()]))
 
@@ -132,11 +139,30 @@ class TweetMapper (object):
     return sorted(cosine_scores.iteritems(),
                   key=lambda x: x[1],
                   reverse=True
-                 )[:10]
+                 )[:50]
 
   def run(self):
     self.read_tweet_from_file()
     self.calculate_tfidf()
     self.generate_city_vectors()
-    tweets_of_a_trend = []
-    self.calculate_cosine_similarity(tweets_of_a_trend)
+    for dirpath, dirs, files in os.walk("test"):
+        for eFile in fnmatch.filter(files, '*.txt'):
+            fle = dirpath+"/"+eFile
+            #fileName[fle]=re.sub('.txt','',eFile)
+            tweets_of_a_trend = []
+            if os.path.isfile(fle) and fle != None:
+                with open(fle,'r') as myfile:
+                    for line in myfile:
+                        #print line
+                        tweets_of_a_trend.append(line)
+            #print tweets_of_a_trend
+            print self.calculate_cosine_similarity(tweets_of_a_trend)
+            real_rank = {}
+            for line in tweets_of_a_trend:
+                line = json.loads(line)
+                rank = classify_city_id(line["coordinates"]["coordinates"])
+                if real_rank.get(rank,False):
+                    real_rank[rank] += 1
+                else:
+                    real_rank[rank] = 1
+            print sorted(real_rank.iteritems(),key=lambda x: x[1],reverse=True)[:50]
