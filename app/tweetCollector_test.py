@@ -1,5 +1,6 @@
 import library
 import tweetCollector
+import json
 
 class TweetCollectorTest(object):
   def __init__(self):
@@ -18,5 +19,5 @@ class TweetCollectorTest(object):
 
 if __name__ == '__main__':
   tct = TweetCollectorTest()
-  #tct.run()
-  tct.filter()
+  tct.run()
+  #tct.filter()
