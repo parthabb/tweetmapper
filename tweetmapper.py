@@ -5,6 +5,7 @@ import math
 import nltk
 import os
 import re
+import pickle
 import json
 import fnmatch
 import enchant
@@ -56,7 +57,8 @@ class TweetMapper (object):
 
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
-    for trending_tweet_file,fold in filenames:
+
+    for trending_tweet_file in filenames:
       tweets = []
       print trending_tweet_file
       with open(trending_tweet_file, 'r') as f:
@@ -65,15 +67,11 @@ class TweetMapper (object):
       for tweet in tweets:
         tweet = json.loads(tweet)
         self._construct_inverse_map(tweet)
+        print tweet
     #print self.inverse_term_matrix
-      with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
-        json.dump(self.inverse_term_matrix, f_new)
-      self.inverse_term_matrix = {}
-
-      with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
-        json.dump(self.inverse_term_matrix, f_new)
-      self.inverse_term_matrix = {}
-
+    '''  with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
+        json.dump(self.inverse_term_matrix, f_new)'''
+    self.inverse_term_matrix = {}
 
   def calculate_tfidf(self):
     """Calculate the TF-IDF."""
@@ -91,15 +89,6 @@ class TweetMapper (object):
 
   def _construct_inverse_map (self, tweet):
     """Construct an inverse term dictionary."""
-    if (not (tweet.get("lang") and
-             tweet['lang'] == 'en' and
-             tweet.get("coordinates") and
-             tweet.get("coordinates", {}).get("type") == "Point" and
-             float(tweet.get("coordinates", {}).get("coordinates", [-200])[0]) > -157 and
-             float(tweet.get("coordinates", {}).get("coordinates", [200])[0]) < -66 and
-             float(tweet.get("coordinates", {}).get("coordinates", [0, 100])[1]) < 64 and
-             float(tweet.get("coordinates", {}).get("coordinates", [0, -100])[1]) >20)):
-      return 
     tweet_city = classify_city_id(tweet['coordinates']['coordinates'])
 
     for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
@@ -168,6 +157,10 @@ class TweetMapper (object):
 
   def run(self):
     self.read_tweet_from_file()
+    print "read tweet from file"
+    f = open("inverseDict.txt","w")
+    f.write(json.dumps(self.inverse_term_matrix))
+    f.close()
     self.calculate_tfidf()
     print "calculate tf idf"
     self.generate_city_vectors()
