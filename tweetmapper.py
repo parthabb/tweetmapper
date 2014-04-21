@@ -36,7 +36,7 @@ def get_all_file_names():
   Returns:
     A list of all files in directory tweets ending with '.txt'.
   """
-  for x in [13, 12, 11, 10, 9]:
+  for x in [15]:
     for root, _, files in os.walk('%s' % x):
       for f in files:
         if f.endswith('.txt'):
@@ -54,8 +54,12 @@ class TweetMapper (object):
 
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
+    num_files = 0
 
     for trending_tweet_file, fold in filenames:
+      num_files += 1
+      if num_files == 3:
+        return
       tweets = []
       with open(trending_tweet_file, 'r') as f:
         tweets = f.readlines()
@@ -65,9 +69,9 @@ class TweetMapper (object):
         self._construct_inverse_map(tweet)
     #print self.inverse_term_matrix
 
-      with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
-        json.dump(self.inverse_term_matrix, f_new)
-      self.inverse_term_matrix = {}
+#       with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
+#         json.dump(self.inverse_term_matrix, f_new)
+#       self.inverse_term_matrix = {}
 
 
   def calculate_tfidf(self):
@@ -155,8 +159,10 @@ class TweetMapper (object):
 
   def run(self):
     self.read_tweet_from_file()
-    return
     self.calculate_tfidf()
+    with open('tdidf.txt', 'w') as f:
+      json.dump(self.inverse_term_matrix, f)
+    return
     self.generate_city_vectors()
     for dirpath, dirs, files in os.walk("test"):
         for eFile in fnmatch.filter(files, '*.txt'):
