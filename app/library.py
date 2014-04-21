@@ -4,6 +4,7 @@ import tweepy
 from tweepy import streaming
 import sys
 import json
+import os
 
 class listener(streaming.StreamListener):
   def __init__(self, tr, api=None):
@@ -13,7 +14,10 @@ class listener(streaming.StreamListener):
     
   def on_data(self, data):
     self.num_tweets +=1
-    f = open("%s.txt" % self.file,"a")
+    filename = "test/"+str(self.file)+".txt"
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    f = open(filename,"a")
     f.write(data)
     f.close()
     if self.num_tweets < 300:

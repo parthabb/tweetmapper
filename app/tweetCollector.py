@@ -10,6 +10,7 @@ import fnmatch
 import os
 import json
 import cjson
+import time
 
 _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
                     'coordinates', 'favorite_count', 'favorited',
@@ -29,22 +30,78 @@ class TweetCollector(object):
     '''
     collects tweets using rest API
     '''
+    self.apicount = 0
     pass
+
+  def countTimeOut(self):
+    start = time.time();
+    current = time.time();
+    print "Counting down...."
+    while (current - start) < 900:
+        print (current-start);
+        current = time.time();
+    #search(term);
+    self.apicount = 0;
 
   def search(self, term):
     handle = library.TweepyAPIs()
-    term = term + ' -RT'
+    #term = term + ' -RT'
 
     results = []
-    tweets = handle._api.search(q=term,
+    count = 0
+    filename = "test/"+str(term)+".txt"
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    f = open(filename,"a")
+    print term
+    IDList = []
+    while count < 50:
+        tweets = handle._api.search(q=term,
                                lang="en",
-                               count=100)
-    for tweet in tweets:
-      if tweet.coordinates and tweet.text:
-        data = {}
-        for field in _required_fields:
-          data[field] = getattr(tweet, field)
-        results.append(data)
+                               count=100, 
+                                since="2014-04-14", 
+                                until="2014-04-16")
+        #print tweets
+        self.apicount += 1
+        if self.apicount > 90:
+            self.countTimeOut()
+        for tweet in tweets:
+          if tweet.coordinates and tweet.text and (tweet.id not in IDList):
+            count += 1
+            data = {}
+            IDList.append(tweet.id);
+            print IDList
+            data["text"] = tweet.text
+            data["created_at"] = str(tweet.created_at)
+            #data['user'] = tweet.user
+            #data['entities'] = tweet.entities
+            data["id"] = tweet.id
+            data["coordinates"] = tweet.coordinates
+            #data['favorite_count'] = tweet.favorite_count
+            #data['favorited'] = tweet.favorited
+            #data['in_reply_to_status_id'] = tweet.in_reply_to_status_id
+            #data['id_str'] = tweet.id_str
+            #data['in_reply_to_screen_name'] = tweet.in_reply_to_screen_name
+            #data['in_reply_to_status_id_str'] = tweet.in_reply_to_status_id_str
+            #data['in_reply_to_user_id'] = tweet.in_reply_to_user_id
+            #data['in_reply_to_user_id_str'] = tweet.in_reply_to_user_id_str
+            data["lang"] = tweet.lang
+            #data['place'] = tweet.place
+            #data['retweet_count'] = tweet.retweet_count
+            #data['retweeted'] = tweet.retweeted
+            #data['source'] = tweet.source
+            '''#tweet = json.loads(tweet)
+            for field in _required_fields:
+                data[field] = (getattr(tweet, field))
+                if field == "created_at":
+                  data[field] = str(getattr(tweet, field))
+            #print data'''
+            obj = json.dumps(data)
+            #print data
+            f.writelines(obj)
+            f.writelines("\n")
+            results.append(data)
+    f.close()
 
 
     term = term.rstrip(' -RT')

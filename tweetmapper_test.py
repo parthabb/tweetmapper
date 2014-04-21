@@ -13,13 +13,13 @@ def test_scoring():
   print """ =================== read tweet from file ================== """
   tm = TweetMapper()
   tm.run()
-  #print "classification : "+str(tm.city_vectors)
-  f = open("classify.txt","w")
-  #obj = json.dumps(tm.city_vectors)
-  f.writelines(str(tm.city_vectors))
-  f.close()
+#   #print "classification : "+str(tm.city_vectors)
+#   f = open("classify.txt","w")
+#   #obj = json.dumps(tm.city_vectors)
+#   f.writelines(str(tm.city_vectors))
+#   f.close()
   print """ =================== get_all_file_names ================== """
   
 if __name__ == '__main__':
-  test_get_all_file_names()
+#   test_get_all_file_names()
   test_scoring()
