@@ -5,7 +5,6 @@ import math
 import nltk
 import os
 import re
-import pickle
 import json
 
 from app import tweetClassify
@@ -36,12 +35,11 @@ def get_all_file_names():
   Returns:
     A list of all files in directory tweets ending with '.txt'.
   """
-  all_txt_files = []
-  for root, _, files in os.walk('data'):
-    for f in files:
-      if f.endswith('.txt'):
-        all_txt_files.append(os.path.join(root, f))
-  return all_txt_files
+  for x in [13, 12, 11, 10, 9]:
+    for root, _, files in os.walk('%s' % x):
+      for f in files:
+        if f.endswith('.txt'):
+          yield os.path.join(root, f), x
 
 
 class TweetMapper (object):
@@ -56,7 +54,7 @@ class TweetMapper (object):
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
 
-    for trending_tweet_file in filenames:
+    for trending_tweet_file, fold in filenames:
       tweets = []
       with open(trending_tweet_file, 'r') as f:
         tweets = f.readlines()
@@ -64,6 +62,11 @@ class TweetMapper (object):
       for tweet in tweets:
         tweet = json.loads(tweet)
         self._construct_inverse_map(tweet)
+
+      with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
+        json.dump(self.inverse_term_matrix, f_new)
+      self.inverse_term_matrix = {}
+
 
   def calculate_tfidf(self):
     """Calculate the TF-IDF."""
@@ -79,6 +82,15 @@ class TweetMapper (object):
 
   def _construct_inverse_map (self, tweet):
     """Construct an inverse term dictionary."""
+    if (not (tweet.get("lang") and
+             tweet['lang'] == 'en' and
+             tweet.get("coordinates") and
+             tweet.get("coordinates", {}).get("type") == "Point" and
+             float(tweet.get("coordinates", {}).get("coordinates", [-200])[0]) > -157 and
+             float(tweet.get("coordinates", {}).get("coordinates", [200])[0]) < -66 and
+             float(tweet.get("coordinates", {}).get("coordinates", [0, 100])[1]) < 64 and
+             float(tweet.get("coordinates", {}).get("coordinates", [0, -100])[1]) >20)):
+      return 
     tweet_city = classify_city_id(tweet['coordinates']['coordinates'])
 
     for token in re.findall('[a-zA-Z0-9]+', tweet['text']):
@@ -136,6 +148,7 @@ class TweetMapper (object):
 
   def run(self):
     self.read_tweet_from_file()
+    return
     self.calculate_tfidf()
     self.generate_city_vectors()
     tweets_of_a_trend = []
