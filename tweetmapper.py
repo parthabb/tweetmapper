@@ -38,12 +38,11 @@ def get_all_file_names():
   Returns:
     A list of all files in directory tweets ending with '.txt'.
   """
-  all_txt_files = []
-  for root, _, files in os.walk('data/15'):
-    for f in files:
-      if f.endswith('.txt'):
-        all_txt_files.append(os.path.join(root, f))
-  return all_txt_files
+  for x in [14,15]:
+    for root, _, files in os.walk('%s' % x):
+      for f in files:
+        if f.endswith('.txt'):
+          yield os.path.join(root, f), x
 
 
 class TweetMapper (object):
@@ -57,8 +56,8 @@ class TweetMapper (object):
 
   def read_tweet_from_file(self):
     filenames = get_all_file_names()
-
-    for trending_tweet_file in filenames:
+    num_files = 0
+    for trending_tweet_file, fold in filenames:
       tweets = []
       print trending_tweet_file
       with open(trending_tweet_file, 'r') as f:
@@ -67,11 +66,11 @@ class TweetMapper (object):
       for tweet in tweets:
         tweet = json.loads(tweet)
         self._construct_inverse_map(tweet)
-        print tweet
+        #print tweet
     #print self.inverse_term_matrix
-    '''  with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
-        json.dump(self.inverse_term_matrix, f_new)'''
-    self.inverse_term_matrix = {}
+#       with open('%s_cleaned/%s_cleaned.txt' % (fold, trending_tweet_file.rstrip('.txt').lstrip('%s/' % fold)), 'w') as f_new:
+#         json.dump(self.inverse_term_matrix, f_new)
+#       self.inverse_term_matrix = {}
 
   def calculate_tfidf(self):
     """Calculate the TF-IDF."""
@@ -80,7 +79,7 @@ class TweetMapper (object):
       idf = 50.0/float(len(posting.keys()))
       for city, tf in posting.iteritems():
         #tfidf = (float(1.0 + math.log10(tf)) * idf)/ (int(city) + 1)
-        tfidf = (float(1.0 + tf) * idf)/ (int(city) + 1)
+        tfidf = (float(1.0 + tf) * idf)/ (2*int(city) + 1)
         posting[city] = tfidf
 
   def _case_fold (self, text):
@@ -95,9 +94,9 @@ class TweetMapper (object):
       token = self._case_fold(token)
       if not token or token in nltk.corpus.stopwords.words('english'):
         continue
-      wrd = enchant.Dict("en_US")
+      '''wrd = enchant.Dict("en_US")
       if not wrd.check(token):
-          continue
+          continue'''
       token = nltk.WordNetLemmatizer().lemmatize(token)
       postings = self.inverse_term_matrix.get(token, {tweet_city: 0.0})
       postings[tweet_city] = postings.get(tweet_city, 0.0) + 1.0
@@ -130,9 +129,9 @@ class TweetMapper (object):
         token = self._case_fold(token)
         if not token or token in nltk.corpus.stopwords.words('english'):
           continue
-        wrd = enchant.Dict("en_US")
+        '''wrd = enchant.Dict("en_US")
         if not wrd.check(token):
-          continue
+          continue'''
         token = nltk.WordNetLemmatizer().lemmatize(token)
         if query_term_vector.get(token,False):
             query_term_vector[token] += query_term_vector.get(token, 0.0) + 1
@@ -157,15 +156,13 @@ class TweetMapper (object):
 
   def run(self):
     self.read_tweet_from_file()
-    print "read tweet from file"
-    f = open("inverseDict.txt","w")
-    f.write(json.dumps(self.inverse_term_matrix))
-    f.close()
     self.calculate_tfidf()
-    print "calculate tf idf"
+    with open('tdidf.txt', 'w') as f:
+      json.dump(self.inverse_term_matrix, f)
+   # return
     self.generate_city_vectors()
-    print "generate city vecors"
-    print self.inverse_term_matrix.keys()
+    print "generate city vectors"
+    #print self.inverse_term_matrix.keys()
     for dirpath, dirs, files in os.walk("test"):
         tweets_of_a_trend = []
         rs = {}
@@ -180,7 +177,9 @@ class TweetMapper (object):
                         #print line
                         tweets_of_a_trend.append(line)
             #print tweets_of_a_trend
-            rs[eFile] = self.calculate_cosine_similarity(tweets_of_a_trend)
+            rs[eFile] = {}
+            rs[eFile]["tfidf"] = self.calculate_cosine_similarity(tweets_of_a_trend)
+            print rs[eFile]["tfidf"]
             real_rank = {}
             for line in tweets_of_a_trend:
                 line = json.loads(line)
@@ -189,7 +188,8 @@ class TweetMapper (object):
                     real_rank[rank] += 1
                 else:
                     real_rank[rank] = 1
-            print sorted(real_rank.iteritems(),key=lambda x: x[1],reverse=True)[:50]
+            #rs[eFile]["PureVal"] = real_rank
+            rs[eFile]["PureVal"]= sorted(real_rank.iteritems(),key=lambda x: x[1],reverse=True)[:50]
         f = open("result.json","a")
         f.writelines(json.dumps(rs))
         f.close()

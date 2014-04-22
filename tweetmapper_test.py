@@ -21,5 +21,5 @@ def test_scoring():
   print """ =================== get_all_file_names ================== """
   
 if __name__ == '__main__':
-  test_get_all_file_names()
+  #test_get_all_file_names()
   test_scoring()

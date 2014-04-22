@@ -4,6 +4,10 @@ Created on Apr 15, 2014
 @author, spoyler
 '''
 
+import json
+import cjson
+from collections import OrderedDict
+
 cities = (("New York, N.Y.", 2459115 ,(-73.95, 40.67)),
           ("Los Angeles, Calif.", 2442047, (-118.25, 34.05)),
           ("Chicago, Ill.",2379574,(-87.63,41.88)),
@@ -55,4 +59,40 @@ cities = (("New York, N.Y.", 2459115 ,(-73.95, 40.67)),
           ("Wichita, Kans.",2520077,(-97.34,37.69)),
           ("Arlington, Tex.",2355944,(-97.11,32.74))
 )
-        
+
+def processforUI():
+    UI = {}
+    f = open("result.json","r")
+    result = cjson.decode(f.read())
+    for line in result:
+        print result[line]
+        UI[line] = {}
+        UI[line]["tfidf"] = {}
+        for predcity in result[line]["tfidf"]:
+             print predcity
+             #print  cities[predcity[0]]
+             UI[line]["tfidf"][predcity[0]] = {}
+             UI[line]["tfidf"][predcity[0]]["geolocation"] = cities[predcity[0]]
+             UI[line]["tfidf"][predcity[0]]["score"] = predcity[1]
+        UI[line]["tfidf"] = OrderedDict(sorted(UI[line]['tfidf'].iteritems(),
+                  key=lambda x: x[1]['score'],
+                  reverse=True
+                 ))
+        UI[line]["PureVal"] = {}
+        for actualCity in result[line]["PureVal"]:
+             print actualCity
+             #print  cities[int(actualCity[0])]
+             UI[line]["PureVal"][actualCity[0]] = {}
+             UI[line]["PureVal"][actualCity[0]]["geolocation"] = cities[int(actualCity[0])]
+             UI[line]["PureVal"][actualCity[0]]["hits"] = [actualCity[1]]
+        UI[line]["PureVal"] = OrderedDict(sorted(UI[line]['PureVal'].iteritems(),
+                  key=lambda x: x[1]['hits'],
+                  reverse=True
+                 ))
+    f.close()
+    f = open("UIResults.json","w")
+    f.write(json.dumps(UI))
+    f.close()
+if __name__ == '__main__':
+  #test_get_all_file_names()
+  processforUI()

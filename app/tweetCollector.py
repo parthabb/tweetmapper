@@ -148,11 +148,11 @@ class Filter(object):
                 fle = dirpath+"/"+eFile
                 newfile = dirpath+"/"+"new.txt"
                 f = open(newfile,"w")
-                #print fle
+                print fle
                 if os.path.isfile(fle) and fle != None:
                   with open(fle,'r') as myfile:
                     for line in myfile:
-                        print line
+                        #print line
                         line = cjson.decode(line)
                         if "text" in line:
                             tweet = {}

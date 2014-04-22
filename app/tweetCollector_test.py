@@ -20,12 +20,12 @@ class TweetCollectorTest(object):
     
   def filter(self):
     fil = tweetCollector.Filter()
-    #dir = "data/13"
-    #fil.process(dir)
-    dir = "test"
+    dir = "data/14"
     fil.process(dir)
+    #dir = "test"
+    #fil.process(dir)
 
 if __name__ == '__main__':
   tct = TweetCollectorTest()
-  tct.run()
+  #tct.run()
   tct.filter()
