@@ -157,7 +157,7 @@ class TweetMapper (object):
   def run(self):
     self.read_tweet_from_file()
     self.calculate_tfidf()
-    with open('tdidf.txt', 'w') as f:
+    with open('tfidf.txt', 'w') as f:
       json.dump(self.inverse_term_matrix, f)
    # return
     self.generate_city_vectors()
