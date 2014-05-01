@@ -16,8 +16,10 @@ city_coordinates = [coordinates[2] for coordinates in tweetClassify.cities]
 
 TOTAL_CITIES = 50
 
-
 def classify_city_id(geocode):
+  '''
+  Calculates the euclidian distance between the tweet geocode and cities, to return the value of the clostest city
+  '''
   nearest_city_id = 0
   identifier = 0
   minimum = math.sqrt(math.pow(float(city_coordinates[0][0]) - float(geocode[0]), 2) +
