@@ -8,6 +8,8 @@ import json
 import cjson
 from collections import OrderedDict
 
+
+'''Cities in order of their rank with geocode and WOEID'''
 cities = (("New York, N.Y.", 2459115 ,(-73.95, 40.67)),
           ("Los Angeles, Calif.", 2442047, (-118.25, 34.05)),
           ("Chicago, Ill.",2379574,(-87.63,41.88)),
@@ -60,6 +62,8 @@ cities = (("New York, N.Y.", 2459115 ,(-73.95, 40.67)),
           ("Arlington, Tex.",2355944,(-97.11,32.74))
 )
 
+
+'''Processing scores to get an ordered file with the mapping to cities'''
 def processforUI():
     UI = {}
     f = open("result.json","r")
