@@ -1,0 +1,21 @@
+1. Code:
+    tweetmapper.py - builds the inverse dictionary and calculates cosine similiarity
+    library.py - contains API calls
+    tweetClassify.py - Contains lists of cities and geocode, also cleans up the resulting scores and maps them to city names
+    tweetCollector.py - Used to clean the test data and retrieve only tweets in english from the united states
+
+2. All these programs can be used, using the _test.py files. These contain the calls to the functions needed to run this code
+   to completion.
+  
+3. To run the application, first, 
+     run tweetCollector.py 
+     This collects the current trends and associated tweets. It also cleans all data by restricting the tweets to english
+     tweets within the United States.
+     
+    run tweetmapper_test.py
+    This runs the test data, builds the inverse dictionary and calculates the cosine similiarity. These results are written 
+    onto result.json
+    
+    run tweetClassify.py
+    This cleans up the results.json file, it into UIResults.json to give the values in an ordered format, with the names of 
+    the cities as well.
