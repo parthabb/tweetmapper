@@ -24,7 +24,7 @@ _required_fields = ('text', 'created_at', 'user', 'entities', 'id',
 
 class TweetCollector(object):
   '''
-  classdocs
+  Class collects twitter trends and associated 
   '''
   def __init__(self):
     '''
